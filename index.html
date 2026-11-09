@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Doce Conta — o preço certo para cada doce que você faz</title>
+<meta name="description" content="Descubra em minutos quanto cobrar por cada doce: ingredientes, embalagem, gás, seu tempo e a margem que você merece." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Unbounded:wght@400;500;700;900&family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --pink: #FC3B7F; --pink-deep: #e2286c; --pink-soft: #fdd5e2;
+    --cream: #FEF1CF; --cream-deep: #f5dfa6; --cream-soft: #fff8e6;
+    --blue: #0032A8; --blue-deep: #00227a; --blue-soft: #dbe2f7;
+    --ink: #0032A8; --muted: rgba(0,50,168,.62);
+    --shadow: 6px 6px 0 var(--blue); --shadow-sm: 3px 3px 0 var(--blue);
+    --r: 22px; --r-sm: 12px;
+    --display: "Unbounded", "DM Sans", sans-serif;
+    --pixel: "Silkscreen", monospace;
+    --mono: "Space Mono", ui-monospace, monospace;
+    --body: "DM Sans", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  ::selection { background: var(--blue); color: var(--cream); }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  input { background: var(--cream-soft); border: 2px solid var(--blue); border-radius: var(--r-sm); padding: 10px 12px; min-width: 0; width: 100%; transition: box-shadow .12s, transform .12s; }
+  input:focus { outline: none; box-shadow: var(--shadow-sm); transform: translate(-1px,-1px); }
+  input::placeholder { color: var(--muted); }
+  input[type=number] { -moz-appearance: textfield; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .wrap { position: relative; z-index: 1; width: min(1200px, 100% - 40px); margin: 0 auto; }
+  @media (max-width: 640px) { .wrap { width: calc(100% - 32px); } }
+  section { position: relative; z-index: 1; }
+
+  /* ---- custom dropdown ---- */
+  .dd { position: relative; width: 100%; }
+  .dd-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; text-align: left; background: var(--cream-soft); border: 2px solid var(--blue); border-radius: var(--r-sm); padding: 9px 10px 9px 12px; font-size: 15px; transition: box-shadow .12s, transform .12s; }
+  .dd-btn .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dd-btn .lbl.ph { color: var(--muted); }
+  .dd-btn .chev { width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px; background: var(--blue); display: grid; place-items: center; transition: transform .15s, background .15s; }
+  .dd-btn .chev::before { content: ""; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--cream); }
+  .dd-btn:hover, .dd-btn:focus-visible { outline: none; box-shadow: var(--shadow-sm); transform: translate(-1px,-1px); }
+  .dd.open .dd-btn { box-shadow: var(--shadow-sm); transform: translate(-1px,-1px); }
+  .dd.open .dd-btn .chev { transform: rotate(180deg); background: var(--pink); }
+  .dd-menu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 30; min-width: 100%; width: max-content; max-width: min(320px, 80vw); max-height: 280px; overflow-y: auto; background: var(--cream); border: 2.5px solid var(--blue); border-radius: 14px; box-shadow: var(--shadow); padding: 6px; display: none; }
+  .dd.open .dd-menu { display: block; animation: ddin .14s ease-out; }
+  .dd.up .dd-menu { top: auto; bottom: calc(100% + 8px); }
+  @keyframes ddin { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .dd-opt { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; text-align: left; padding: 9px 12px; border: none; background: transparent; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--blue); }
+  .dd-opt small { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .dd-opt:hover, .dd-opt:focus-visible { outline: none; background: var(--pink); color: var(--cream); }
+  .dd-opt:hover small, .dd-opt:focus-visible small { color: rgba(254,241,207,.85); }
+  .dd-opt.sel { background: var(--blue); color: var(--cream); }
+  .dd-opt.sel small { color: rgba(254,241,207,.85); }
+  .dd-opt.sel::after { content: "✓"; font-family: var(--pixel); font-size: 11px; }
+  .dd-opt.empty { color: var(--muted); font-style: italic; }
+  .dd-menu .dd-head { font-family: var(--pixel); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 8px 12px 6px; }
+  .card.blue .dd-btn { color: var(--blue); border-color: var(--cream); }
+
+  /* ---- type ---- */
+  .eyebrow { font-family: var(--pixel); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 10px; }
+  .eyebrow::before { content: ""; width: 9px; height: 9px; background: currentColor; box-shadow: 3px 3px 0 var(--pink); }
+  h2.title { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 4.6vw, 54px); line-height: 1.02; letter-spacing: -1.5px; margin: 14px 0 16px; max-width: 18ch; }
+  h2.title em { font-style: normal; color: var(--pink); }
+  .lead { font-size: clamp(16px, 1.5vw, 19px); max-width: 56ch; color: var(--muted); margin: 0; }
+  .tag { font-family: var(--pixel); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--cream); color: var(--blue); border: 2px solid var(--blue); border-radius: 8px; padding: 4px 10px; box-shadow: 2px 2px 0 var(--blue); display: inline-block; }
+  .tag.pink { background: var(--pink); color: var(--cream); }
+  .tag.blue { background: var(--blue); color: var(--cream); box-shadow: 2px 2px 0 var(--pink); }
+
+  /* ---- buttons ---- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: -.2px; padding: 15px 24px; border-radius: 999px; border: 2.5px solid var(--blue); background: var(--cream); color: var(--blue); box-shadow: 4px 4px 0 var(--blue); transition: transform .12s, box-shadow .12s; white-space: nowrap; text-decoration: none; }
+  .btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--blue); }
+  .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--blue); }
+  .btn.pink { background: var(--pink); color: var(--cream); }
+  .btn.blue { background: var(--blue); color: var(--cream); box-shadow: 4px 4px 0 var(--pink); }
+  .btn.blue:hover { box-shadow: 6px 6px 0 var(--pink); }
+  .btn.ghost { background: transparent; box-shadow: none; border-style: dashed; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .8px; }
+  .btn.ghost:hover { background: var(--cream-soft); transform: none; box-shadow: none; }
+  .btn.sm { padding: 9px 14px; font-size: 12px; box-shadow: var(--shadow-sm); }
+  .btn.icon { width: 34px; height: 34px; padding: 0; border-radius: 9px; }
+  .btn.xl { font-size: 17px; padding: 20px 34px; }
+  .btn .arrow { transition: transform .15s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  /* ---- nav ---- */
+  .nav { position: sticky; top: 0; z-index: 20; background: var(--cream); border-bottom: 2.5px solid var(--blue); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 68px; }
+  .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; }
+  .brand .mark { width: 38px; height: 38px; border-radius: 11px; background: var(--pink); border: 2px solid var(--blue); box-shadow: var(--shadow-sm); display: grid; place-items: center; }
+  .brand .name { font-family: var(--display); font-weight: 900; font-size: 18px; letter-spacing: -.5px; }
+  .nav-links { display: flex; gap: 26px; font-family: var(--mono); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  .nav-links a { color: inherit; text-decoration: none; border-bottom: 2px solid transparent; padding-bottom: 2px; }
+  .nav-links a:hover { border-color: var(--pink); }
+  @media (max-width: 860px) { .nav-links { display: none; } }
+  @media (max-width: 480px) { .nav .btn { padding: 10px 14px; font-size: 12px; } }
+
+  /* ---- hero ---- */
+  .hero { background: var(--pink); color: var(--cream); border-bottom: 3px solid var(--blue); overflow: hidden; position: relative; }
+  .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .3; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .hero .wrap > * { min-width: 0; }
+  .hero .wrap { display: grid; grid-template-columns: 1fr; gap: 44px; padding: clamp(56px, 8vw, 110px) 0 clamp(60px, 8vw, 100px); align-items: center; }
+  @media (min-width: 980px) { .hero .wrap { grid-template-columns: 1.15fr .85fr; } }
+  .hero h1 { font-family: var(--display); font-weight: 900; font-size: clamp(36px, 7.4vw, 96px); overflow-wrap: anywhere; line-height: .96; letter-spacing: -3px; margin: 22px 0 24px; text-shadow: 6px 6px 0 var(--blue); }
+  .hero h1 .pix { font-family: var(--pixel); font-weight: 700; letter-spacing: 0; font-size: .92em; display: inline-block; }
+  .hero .lead { color: rgba(254,241,207,.92); font-size: clamp(17px, 1.6vw, 21px); max-width: 44ch; }
+  .hero .cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 32px; }
+  .hero .cta .note { font-family: var(--mono); font-size: 12px; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; opacity: .95; }
+  .hero .proof { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
+  .receipt-wrap { position: relative; justify-self: center; width: min(420px, 100%); margin-top: 20px; }
+  .receipt { background: var(--cream); color: var(--blue); border: 3px solid var(--blue); border-radius: 20px; box-shadow: 10px 10px 0 var(--blue); padding: 24px 24px 20px; font-family: var(--mono); transform: rotate(-2deg); position: relative; }
+  .receipt .r-head { display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding-bottom: 12px; border-bottom: 2px dashed var(--blue); }
+  .receipt h3 { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: -.6px; margin: 16px 0 12px; }
+  .receipt .line { display: flex; justify-content: space-between; font-size: 13px; padding: 7px 0; }
+  .receipt .line.sub { color: var(--muted); font-size: 12px; }
+  .receipt .line.strike { text-decoration: line-through; color: var(--muted); }
+  .receipt .line.total { border-top: 2px dashed var(--blue); margin-top: 8px; padding-top: 12px; font-family: var(--display); font-weight: 900; font-size: 18px; align-items: baseline; }
+  .receipt .line.total b { color: var(--pink); font-size: 26px; }
+  .receipt .stamp { position: absolute; right: -18px; top: -22px; background: var(--blue); color: var(--cream); font-family: var(--pixel); font-size: 12px; letter-spacing: 1px; padding: 10px 14px; border: 3px solid var(--cream); border-radius: 12px; transform: rotate(8deg); box-shadow: 4px 4px 0 var(--pink); }
+  .receipt .bar { margin-top: 16px; height: 12px; background: repeating-linear-gradient(90deg, var(--blue) 0 3px, transparent 3px 6px, var(--blue) 6px 7px, transparent 7px 11px); opacity: .9; }
+  .sticker { position: absolute; pointer-events: none; }
+  .st-smile { left: -44px; bottom: -30px; width: 96px; animation: float 5s ease-in-out infinite; }
+  .st-spark { right: -26px; bottom: 60px; width: 54px; animation: spin 14s linear infinite; }
+  .st-cursor { right: 40px; top: -46px; width: 48px; animation: float 6s ease-in-out infinite reverse; }
+  .hero .ring { position: absolute; left: -8%; top: -12%; width: 56%; opacity: .55; pointer-events: none; }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-12px) rotate(4deg); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (max-width: 640px) { .st-smile { left: -16px; width: 70px; } .st-cursor { display: none; } .receipt .stamp { right: -6px; } }
+
+  /* ---- marquee ---- */
+  .marquee { overflow: hidden; background: var(--blue); color: var(--cream); border-bottom: 3px solid var(--blue); }
+  .marquee .track { display: flex; width: max-content; padding: 13px 0; animation: marquee 30s linear infinite; font-family: var(--pixel); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+  .marquee span { padding-right: 40px; }
+  .marquee span::before { content: "✦"; margin-right: 40px; color: var(--pink); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  /* ---- pain ---- */
+  .pain { padding: clamp(60px, 8vw, 110px) 0; }
+  .pain-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 36px; }
+  @media (min-width: 820px) { .pain-grid { grid-template-columns: repeat(3, 1fr); } }
+  .pain-card { border: 2.5px solid var(--blue); border-radius: var(--r); padding: 26px; background: var(--cream-soft); box-shadow: var(--shadow); position: relative; transition: transform .15s, box-shadow .15s; }
+  .pain-card:hover { transform: translate(-3px,-3px); box-shadow: 9px 9px 0 var(--blue); }
+  .pain-card .n { font-family: var(--pixel); font-size: 12px; color: var(--pink); letter-spacing: 1px; }
+  .pain-card h3 { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -.5px; margin: 14px 0 10px; line-height: 1.15; }
+  .pain-card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .pain-card.blue { background: var(--blue); color: var(--cream); box-shadow: 6px 6px 0 var(--pink); }
+  .pain-card.blue p { color: rgba(254,241,207,.8); }
+  .pain-card.blue:hover { box-shadow: 9px 9px 0 var(--pink); }
+  .pain-card.pink { background: var(--pink); color: var(--cream); }
+  .pain-card.pink .n { color: var(--cream); }
+  .pain-card.pink p { color: rgba(254,241,207,.85); }
+
+  /* ---- how ---- */
+  .how { background: var(--blue); color: var(--cream); padding: clamp(60px, 8vw, 110px) 0; border-top: 3px solid var(--blue); border-bottom: 3px solid var(--blue); }
+  .how .lead { color: rgba(254,241,207,.8); }
+  .steps { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 40px; counter-reset: s; }
+  @media (min-width: 820px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .step { background: var(--cream); color: var(--blue); border: 3px solid var(--cream); border-radius: var(--r); padding: 26px; box-shadow: 6px 6px 0 var(--pink); position: relative; }
+  .step::before { counter-increment: s; content: "0" counter(s); font-family: var(--pixel); font-size: 42px; line-height: 1; color: var(--pink); display: block; margin-bottom: 18px; }
+  .step h3 { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -.4px; margin: 0 0 8px; }
+  .step p { margin: 0; color: var(--muted); font-size: 15px; }
+  .how .cta { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .how .btn.pink { border-color: var(--cream); box-shadow: 4px 4px 0 var(--cream); }
+  .how .btn.pink:hover { box-shadow: 6px 6px 0 var(--cream); }
+
+  /* ---- tool ---- */
+  .tool { padding: clamp(60px, 8vw, 110px) 0; }
+  .tool-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
+  .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 22px; }
+  .tab { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 13px; padding: 12px 18px; border-radius: 999px; border: 2.5px solid var(--blue); background: var(--cream-soft); transition: transform .12s, box-shadow .12s; }
+  .tab .count { font-family: var(--mono); font-size: 11px; background: var(--blue); color: var(--cream); border-radius: 999px; padding: 2px 8px; }
+  .tab[aria-selected=true] { background: var(--blue); color: var(--cream); box-shadow: 4px 4px 0 var(--pink); }
+  .tab[aria-selected=true] .count { background: var(--pink); }
+  .tab:hover:not([aria-selected=true]) { transform: translate(-1px,-1px); box-shadow: var(--shadow-sm); }
+  .panel[hidden] { display: none; }
+
+  .card { background: var(--cream-soft); border: 2.5px solid var(--blue); border-radius: var(--r); box-shadow: var(--shadow); padding: 22px; position: relative; }
+  .card.pink { background: var(--pink); color: var(--cream); }
+  .card.blue { background: var(--blue); color: var(--cream); box-shadow: 6px 6px 0 var(--pink); }
+  .card.blue input { color: var(--blue); border-color: var(--cream); }
+  .card.blue .kv .k small, .card.blue .kv .v .unit { color: rgba(254,241,207,.75); }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .card-head h3 { font-family: var(--display); font-weight: 900; font-size: 17px; margin: 0; letter-spacing: -.2px; display: flex; align-items: center; gap: 10px; }
+  .card-head h3 .step-n { font-family: var(--pixel); font-size: 12px; background: var(--pink); color: var(--cream); border: 2px solid var(--blue); border-radius: 8px; width: 30px; height: 30px; display: grid; place-items: center; box-shadow: 2px 2px 0 var(--blue); }
+  .card-head p { margin: 4px 0 0; font-size: 14px; color: var(--muted); width: 100%; }
+  .hint { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .recipe-head { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 20px; }
+  .recipe-head .name input { font-family: var(--display); font-weight: 900; font-size: clamp(22px, 3vw, 34px); letter-spacing: -.8px; border: none; border-bottom: 3px solid var(--blue); border-radius: 0; background: transparent; padding: 6px 2px; }
+  .recipe-head .name input:focus { box-shadow: none; transform: none; border-bottom-color: var(--pink); }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-family: var(--mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .field .inline { display: flex; align-items: center; gap: 8px; }
+  .field .inline .unit { font-family: var(--mono); font-size: 12px; white-space: nowrap; color: var(--muted); }
+  .recipe-head .side { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (min-width: 820px) { .recipe-head { grid-template-columns: 1.6fr 1fr; align-items: end; } }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 22px; }
+  .grid > *, .stack > *, .stats > *, .bento > *, .faq .wrap > *, .gap > * { min-width: 0; }
+  @media (min-width: 980px) { .grid.cols-2 { grid-template-columns: 1.35fr 1fr; } }
+  .stack { display: flex; flex-direction: column; gap: 22px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  #recipe-rows { overflow: visible; }
+  @media (max-width: 640px) { #recipe-rows { overflow-x: auto; margin: 0 -6px; padding: 0 6px 120px; margin-bottom: -120px; } #recipe-rows table { min-width: 480px; } }
+  th { font-family: var(--mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 6px 10px; font-weight: 400; }
+  th.r, td.r { text-align: right; }
+  td { padding: 6px; vertical-align: middle; border-top: 1.5px dashed rgba(0,50,168,.25); }
+  tbody tr:first-child td { border-top: none; }
+  .row-del { opacity: .45; transition: opacity .12s; }
+  tr:hover .row-del { opacity: 1; }
+  .total-line { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding-top: 14px; border-top: 2.5px solid var(--blue); }
+  .total-line .label { font-family: var(--pixel); font-size: 12px; letter-spacing: .5px; }
+  .total-line .value { font-family: var(--display); font-weight: 900; font-size: 24px; color: var(--pink-deep); }
+  .card.blue .total-line { border-color: currentColor; }
+  .card.blue .total-line .value { color: var(--cream); }
+  .empty { padding: 18px; text-align: center; border: 2px dashed rgba(0,50,168,.35); border-radius: var(--r-sm); font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: center; }
+  .kv .k { font-size: 15px; font-weight: 500; }
+  .kv .k small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .kv .v { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+  .kv .v input { width: 110px; text-align: right; }
+  .kv .v .unit { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .calc { font-family: var(--mono); font-size: 13px; display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--cream); border: 1.5px dashed var(--blue); border-radius: var(--r-sm); margin-top: 12px; }
+  .calc b { color: var(--pink-deep); white-space: nowrap; }
+
+  .summary { margin-top: 26px; }
+  .stats { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 720px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+  .stat { padding: 22px 24px; min-height: 160px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+  .stat .lbl { font-family: var(--pixel); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  .stat .big { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 3.6vw, 44px); letter-spacing: -1.5px; line-height: 1; margin: 12px 0 6px; }
+  .stat .sub { font-family: var(--mono); font-size: 12px; opacity: .85; }
+  .stat.margin .big { display: flex; align-items: baseline; gap: 6px; }
+  .stat.margin input[type=number] { width: 130px; font-family: var(--display); font-weight: 900; font-size: 30px; padding: 4px 8px 4px 12px; background: var(--cream); color: var(--blue); border-color: var(--cream); border-radius: 12px; }
+  .stat.margin .pct { font-size: 28px; }
+  .stat.margin input[type=range] { width: 100%; margin: 10px 0 0; accent-color: var(--pink); border: none; background: transparent; padding: 0; box-shadow: none; }
+  .stat.price .big { color: var(--pink-deep); }
+  .stat .bg { position: absolute; right: -14px; bottom: -22px; width: 120px; opacity: .18; pointer-events: none; }
+  .results { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
+  @media (min-width: 720px) { .results { grid-template-columns: 1fr 1fr 1fr; } }
+  .result { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 2px solid var(--blue); border-radius: var(--r-sm); background: var(--cream-soft); }
+  .result .k { font-family: var(--mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .result .v { font-family: var(--display); font-weight: 700; font-size: 20px; }
+  .result .v small { display: block; font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .result.good .v { color: #0a7a3c; }
+  .result.bad .v { color: var(--pink-deep); }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: 24px; }
+  .actions .right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .gap { margin-top: 26px; background: var(--pink); color: var(--cream); border: 3px solid var(--blue); border-radius: var(--r); box-shadow: var(--shadow); padding: 26px; display: grid; grid-template-columns: 1fr; gap: 22px; align-items: center; overflow: hidden; position: relative; }
+  @media (min-width: 900px) { .gap { grid-template-columns: 1.1fr 1fr; } }
+  .gap h3 { font-family: var(--display); font-weight: 900; font-size: clamp(22px, 2.6vw, 30px); letter-spacing: -1px; margin: 10px 0 8px; line-height: 1.05; }
+  .gap p { margin: 0; color: rgba(254,241,207,.9); font-size: 15px; }
+  .gap .in { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+  .gap .in input { width: 140px; font-family: var(--display); font-weight: 900; font-size: 24px; color: var(--blue); border-color: var(--blue); }
+  .gap .in .unit { font-family: var(--mono); font-size: 13px; }
+  .gap .out { background: var(--cream); color: var(--blue); border: 2.5px solid var(--blue); border-radius: 16px; padding: 20px 22px; }
+  .gap .out .k { font-family: var(--pixel); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+  .gap .out .v { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 4vw, 46px); letter-spacing: -2px; line-height: 1; margin: 8px 0 6px; }
+  .gap .out .v.bad { color: var(--pink-deep); }
+  .gap .out .v.good { color: #0a7a3c; }
+  .gap .out .s { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .gap .eyebrow::before { box-shadow: 3px 3px 0 var(--blue); }
+
+  .lib-table input { padding: 8px 10px; }
+  .lib-table .unitcost { font-family: var(--mono); font-size: 13px; color: var(--pink-deep); white-space: nowrap; }
+  .lib-scroll { overflow-x: auto; padding-bottom: 160px; margin-bottom: -160px; }
+  .tips { margin-top: 22px; background: var(--blue-soft); }
+  .tips ul { margin: 8px 0 0; padding-left: 18px; font-size: 15px; }
+  .tips li + li { margin-top: 6px; }
+
+  .fav-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  @media (min-width: 700px) { .fav-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1060px) { .fav-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .fav { display: flex; flex-direction: column; gap: 12px; transition: transform .15s, box-shadow .15s; }
+  .fav:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 var(--blue); }
+  .fav h4 { font-family: var(--display); font-weight: 900; font-size: 18px; margin: 4px 0 0; letter-spacing: -.3px; padding-right: 36px; }
+  .fav .meta { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+  .fav .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fav .nums > div { background: var(--cream); border: 1.5px dashed var(--blue); border-radius: var(--r-sm); padding: 10px 12px; }
+  .fav .nums .k { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .fav .nums .v { font-family: var(--display); font-weight: 700; font-size: 17px; margin-top: 2px; }
+  .fav .nums .v.pink { color: var(--pink-deep); }
+  .fav .del { position: absolute; top: 14px; right: 14px; }
+  .fav .ribbon { position: absolute; top: -12px; left: 16px; transform: rotate(-3deg); }
+
+  /* ---- bento ---- */
+  .bento-sec { padding: clamp(60px, 8vw, 110px) 0; }
+  .bento { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 36px; }
+  @media (min-width: 820px) { .bento { grid-template-columns: repeat(6, 1fr); } .b-1 { grid-column: span 4; } .b-2, .b-3, .b-4, .b-5 { grid-column: span 2; } }
+  .bento .card { min-height: 200px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; overflow: hidden; }
+  .bento h3 { font-family: var(--display); font-weight: 700; font-size: 21px; letter-spacing: -.5px; margin: 0; line-height: 1.1; }
+  .bento p { margin: 0; color: var(--muted); font-size: 15px; }
+  .bento .card.pink p, .bento .card.blue p { color: rgba(254,241,207,.85); }
+  .bento .big-n { font-family: var(--display); font-weight: 900; font-size: clamp(44px, 6vw, 80px); letter-spacing: -3px; line-height: .9; margin-bottom: 10px; }
+  .bento .deco { position: absolute; right: 18px; top: 18px; width: 56px; }
+
+  /* ---- faq ---- */
+  .faq { background: var(--cream-soft); border-top: 3px solid var(--blue); border-bottom: 3px solid var(--blue); padding: clamp(60px, 8vw, 110px) 0; }
+  .faq .wrap { display: grid; grid-template-columns: 1fr; gap: 30px; }
+  @media (min-width: 900px) { .faq .wrap { grid-template-columns: 1fr 1.3fr; } }
+  details { border: 2.5px solid var(--blue); border-radius: 16px; background: var(--cream); margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+  summary { cursor: pointer; list-style: none; padding: 18px 20px; font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: -.2px; display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--pixel); font-size: 20px; color: var(--pink); flex-shrink: 0; }
+  details[open] summary::after { content: "–"; }
+  details p { margin: 0; padding: 0 20px 18px; color: var(--muted); font-size: 15px; }
+
+  /* ---- final ---- */
+  .final { background: var(--pink); color: var(--cream); padding: clamp(70px, 10vw, 130px) 0; text-align: center; position: relative; overflow: hidden; }
+  .final h2 { font-family: var(--display); font-weight: 900; font-size: clamp(34px, 6vw, 76px); letter-spacing: -2.5px; line-height: .98; margin: 16px auto 20px; max-width: 16ch; text-shadow: 5px 5px 0 var(--blue); }
+  .final .lead { color: rgba(254,241,207,.92); margin: 0 auto 32px; }
+  .final .eyebrow::before { box-shadow: 3px 3px 0 var(--blue); }
+  .final .ring2 { position: absolute; right: -10%; bottom: -40%; width: 50%; opacity: .5; pointer-events: none; }
+
+  footer { background: var(--blue); color: var(--cream); padding: 40px 0; position: relative; z-index: 1; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  footer .brand .mark { box-shadow: 3px 3px 0 var(--pink); border-color: var(--cream); }
+  footer .links { display: flex; gap: 22px; font-family: var(--mono); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  footer .links a { color: inherit; text-decoration: none; opacity: .85; }
+  footer .links a:hover { opacity: 1; border-bottom: 2px solid var(--pink); }
+  footer .tagline { font-family: var(--pixel); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; opacity: .8; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; background: var(--blue); color: var(--cream); border: 2px solid var(--cream); box-shadow: 4px 4px 0 var(--pink); font-family: var(--mono); font-size: 13px; padding: 12px 18px; border-radius: 999px; z-index: 50; transition: opacity .2s, transform .2s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .marquee .track, .sticker { animation: none; } }
+
+  /* ---- print sheet ---- */
+  #print-sheet { display: none; }
+  @media print {
+    @page { size: A4; margin: 12mm 12mm 14mm; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: #fff; color: var(--blue); font-size: 12px; line-height: 1.4; }
+    body::before { display: none; }
+    body > *:not(#print-sheet) { display: none !important; }
+    #print-sheet { display: block; }
+  }
+  #print-sheet { font-family: var(--body); color: var(--blue); }
+  .ps-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 3px solid var(--blue); }
+  .ps-head .brand .mark { width: 34px; height: 34px; box-shadow: none; }
+  .ps-head .brand .name { font-size: 17px; }
+  .ps-head .doc { text-align: right; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .ps-head .doc b { display: block; font-family: var(--pixel); font-size: 12px; color: var(--blue); letter-spacing: 1px; margin-bottom: 3px; }
+  .ps-title { margin: 18px 0 14px; }
+  .ps-title h1 { font-family: var(--display); font-weight: 900; font-size: 30px; letter-spacing: -1.2px; margin: 0 0 6px; line-height: 1.05; }
+  .ps-title .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; gap: 18px; }
+  .ps-band { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 0; border: 3px solid var(--blue); border-radius: 16px; overflow: hidden; margin-bottom: 18px; }
+  .ps-band > div { padding: 16px 18px; }
+  .ps-band .main { background: var(--pink); color: var(--cream); }
+  .ps-band .main .k, .ps-band .alt .k { font-family: var(--pixel); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .ps-band .main .v { font-family: var(--display); font-weight: 900; font-size: 34px; letter-spacing: -1.5px; line-height: 1; margin-top: 6px; }
+  .ps-band .main .s { font-family: var(--mono); font-size: 10px; margin-top: 6px; opacity: .9; }
+  .ps-band .alt { background: var(--cream); border-left: 3px solid var(--blue); }
+  .ps-band .alt .v { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -.6px; margin-top: 8px; }
+  .ps-band .alt .s { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .ps-sec { border: 2px solid var(--blue); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; break-inside: avoid; }
+  .ps-sec h2 { font-family: var(--display); font-weight: 900; font-size: 13px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  .ps-sec h2 .n { font-family: var(--pixel); font-size: 10px; background: var(--pink); color: var(--cream); border-radius: 6px; width: 22px; height: 22px; display: grid; place-items: center; }
+  .ps-sec table { width: 100%; border-collapse: collapse; }
+  .ps-sec th { font-family: var(--mono); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 4px 6px; font-weight: 400; }
+  .ps-sec td { padding: 5px 4px; border-top: 1px dashed rgba(0,50,168,.3); font-size: 12px; }
+  .ps-sec tbody tr:first-child td { border-top: none; }
+  .ps-sec .r { text-align: right; }
+  .ps-sec .num { font-size: 12px; }
+  .ps-sec .sub { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; padding-top: 8px; border-top: 2px solid var(--blue); font-family: var(--pixel); font-size: 10px; letter-spacing: 1px; }
+  .ps-sec .sub b { font-family: var(--display); font-size: 16px; letter-spacing: -.5px; color: var(--pink-deep); }
+  .ps-sec .muted { color: var(--muted); font-size: 11px; }
+  .ps-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ps-total { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 4px; }
+  .ps-total > div { background: var(--cream); border: 2px solid var(--blue); border-radius: 12px; padding: 10px 12px; }
+  .ps-total .k { font-family: var(--mono); font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .ps-total .v { font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: -.5px; margin-top: 4px; }
+  .ps-total .v.good { color: #0a7a3c; }
+  .ps-foot { margin-top: 16px; padding-top: 10px; border-top: 2px solid var(--blue); display: flex; justify-content: space-between; gap: 16px; font-family: var(--mono); font-size: 9px; letter-spacing: .8px; color: var(--muted); }
+  .ps-foot b { font-family: var(--pixel); color: var(--blue); letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 11h14l-1.4 8.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 11Z" fill="#FEF1CF" stroke="#0032A8" stroke-width="1.8"/><path d="M6 11c-1.5-3.5.5-6 3-6 1-2.5 5-2.5 6 0 2.5 0 4.5 2.5 3 6" fill="#FEF1CF" stroke="#0032A8" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="4" r="1.6" fill="#0032A8"/></svg></span>
+      <span class="name">Doce Conta</span>
+    </a>
+    <div class="nav-links">
+      <a href="#dor">Por quê</a>
+      <a href="#como">Como funciona</a>
+      <a href="#planilha">A planilha</a>
+      <a href="#duvidas">Dúvidas</a>
+    </div>
+    <a class="btn pink sm" href="#planilha">Calcular meu preço</a>
+  </div>
+</nav>
+
+<section class="hero" id="top">
+  <svg class="ring" viewBox="0 0 400 220" fill="none" aria-hidden="true"><ellipse cx="200" cy="110" rx="190" ry="70" stroke="#FEF1CF" stroke-width="5" transform="rotate(-14 200 110)"/></svg>
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">para quem vive de fazer doce</span>
+      <h1>Pare de vender doce no <span class="pix">PREJUÍZO.</span></h1>
+      <p class="lead">Em dois minutos você descobre quanto cada brigadeiro, bolo ou bombom custa de verdade e quanto precisa cobrar pra ter lucro de verdade.</p>
+      <div class="cta">
+        <a class="btn blue xl" href="#planilha">Calcular meu preço agora <span class="arrow">→</span></a>
+        <span class="note">✦ sem cadastro · resultado na hora</span>
+      </div>
+      <div class="proof">
+        <span class="tag">ingredientes</span><span class="tag">embalagem</span><span class="tag">gás e luz</span><span class="tag">seu tempo</span><span class="tag blue">margem de lucro</span>
+      </div>
+    </div>
+    <div class="receipt-wrap">
+      <div class="receipt" aria-label="Exemplo de precificação">
+        <span class="stamp">PREÇO CERTO</span>
+        <div class="r-head"><span>cupom da verdade</span><span>brigadeiro</span></div>
+        <h3>Brigadeiro de Ovomaltine</h3>
+        <div class="line sub"><span>rendimento</span><span>20 unidades</span></div>
+        <div class="line"><span>ingredientes</span><span class="num">R$ 15,42</span></div>
+        <div class="line"><span>embalagem + gás + luz</span><span class="num">R$ 7,31</span></div>
+        <div class="line"><span>sua hora de trabalho</span><span class="num">R$ 7,50</span></div>
+        <div class="line sub"><span>custo por unidade</span><span class="num">R$ 1,51</span></div>
+        <div class="line strike"><span>o que você cobra hoje</span><span class="num">R$ 2,00</span></div>
+        <div class="line total"><span>cobre, no mínimo</span><b class="num">R$ 3,02</b></div>
+        <div class="bar"></div>
+      </div>
+      <svg class="sticker st-smile" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="#FEF1CF" stroke="#0032A8" stroke-width="5"/><rect x="30" y="34" width="10" height="14" fill="#0032A8"/><rect x="60" y="34" width="10" height="14" fill="#0032A8"/><path d="M28 62c6 10 38 10 44 0" stroke="#0032A8" stroke-width="6" stroke-linecap="square" fill="none"/></svg>
+      <svg class="sticker st-spark" viewBox="0 0 60 60" aria-hidden="true"><path d="M30 2c2 18 10 26 28 28-18 2-26 10-28 28-2-18-10-26-28-28 18-2 26-10 28-28Z" fill="#FEF1CF" stroke="#0032A8" stroke-width="3"/></svg>
+      <svg class="sticker st-cursor" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 4l30 20-13 3 8 14-6 3-8-14-11 9z" fill="#FEF1CF" stroke="#0032A8" stroke-width="3" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="track" id="marquee"></div></div>
+
+<section class="pain" id="dor">
+  <div class="wrap">
+    <span class="eyebrow">o problema</span>
+    <h2 class="title reveal">Você faz um doce <em>incrível</em>. E cobra como se não fosse.</h2>
+    <p class="lead reveal">A maioria das confeiteiras precifica de cabeça, copia o preço da vizinha ou arredonda pra baixo com medo de perder cliente. O resultado é trabalhar muito e sobrar pouco.</p>
+    <div class="pain-grid">
+      <div class="pain-card reveal"><span class="n">01 / INGREDIENTE</span><h3>O leite condensado subiu. Seu preço, não.</h3><p>Cada compra no mercado muda o seu custo. Sem uma conta que acompanhe, a margem vai sumindo sem avisar.</p></div>
+      <div class="pain-card blue reveal"><span class="n">02 / INVISÍVEIS</span><h3>Embalagem, gás, luz e o seu tempo nunca entram na conta.</h3><p>Você só soma o que vê na nota fiscal. O resto sai do seu bolso, e o seu trabalho acaba de graça.</p></div>
+      <div class="pain-card pink reveal"><span class="n">03 / MEDO</span><h3>“Se eu subir o preço, vou perder cliente.”</h3><p>Quem cobra certo escolhe cliente. Quem cobra barato trabalha o dobro pro mesmo dinheiro.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="como">
+  <div class="wrap">
+    <span class="eyebrow">como funciona</span>
+    <h2 class="title reveal">Três passos. <em>Nenhuma</em> fórmula pra decorar.</h2>
+    <p class="lead reveal">Você só informa o que já sabe. A planilha faz a conta, mostra o preço por unidade e guarda a receita pra próxima fornada.</p>
+    <div class="steps">
+      <div class="step reveal"><h3>Monte sua despensa</h3><p>Cadastre cada ingrediente com o preço da embalagem. O custo por grama é calculado na hora, pra sempre.</p></div>
+      <div class="step reveal"><h3>Monte a receita</h3><p>Escolha os ingredientes, a quantidade, a embalagem e quantas horas você gasta. Tudo soma sozinho.</p></div>
+      <div class="step reveal"><h3>Escolha seu lucro</h3><p>Arraste a margem e veja o preço por unidade, o faturamento do lote e quanto sobra pra você.</p></div>
+    </div>
+    <div class="cta"><a class="btn pink xl" href="#planilha">Quero meu preço certo <span class="arrow">→</span></a></div>
+  </div>
+</section>
+
+<section class="tool" id="planilha">
+  <div class="wrap">
+    <div class="tool-head">
+      <div>
+        <span class="eyebrow">a planilha</span>
+        <h2 class="title" style="margin-bottom:6px">Sua precificação, <em>ao vivo.</em></h2>
+        <p class="lead">Mexa em qualquer número e veja o preço mudar na hora.</p>
+      </div>
+      <span class="tag pink">receita de exemplo já carregada</span>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Seções da planilha">
+      <button class="tab" role="tab" data-tab="pricing" aria-selected="true">⌗ Precificação</button>
+      <button class="tab" role="tab" data-tab="library" aria-selected="false">▤ Despensa <span class="count" id="count-ingredients">0</span></button>
+      <button class="tab" role="tab" data-tab="favorites" aria-selected="false">★ Minhas receitas <span class="count" id="count-favorites">0</span></button>
+    </nav>
+
+    <div class="panel" id="panel-pricing" role="tabpanel">
+      <div class="card recipe-head">
+        <div class="field name"><label for="recipe-name">Nome da receita</label><input id="recipe-name" type="text" placeholder="Ex.: Brigadeiro de Ovomaltine" autocomplete="off" /></div>
+        <div class="side">
+          <div class="field"><label for="recipe-yield">Rendimento</label><div class="inline"><input id="recipe-yield" class="num" type="number" min="1" step="1" value="20" /><span class="unit">unid.</span></div></div>
+          <div class="field"><label for="recipe-time">Tempo de preparo</label><div class="inline"><input id="recipe-time" class="num" type="number" min="0" step="0.25" value="1" /><span class="unit">horas</span></div></div>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <div class="card-head">
+            <h3><span class="step-n">1</span> Ingredientes</h3>
+            <button class="btn sm" onclick="addRecipeRow()">+ Ingrediente</button>
+            <p>Escolha da sua despensa e informe a quantidade usada. O custo unitário vem de lá.</p>
+          </div>
+          <div id="recipe-rows"></div>
+          <div class="total-line"><span class="label">INGREDIENTES</span><span class="value num" id="t-ingredients">R$ 0,00</span></div>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <div class="card-head"><h3><span class="step-n">2</span> Custos fixos</h3><button class="btn sm" onclick="addExtraCost()">+ Custo</button></div>
+            <div class="kv">
+              <div class="k">📦 Embalagens <small>caixinhas, forminhas, fitas, etiquetas</small></div>
+              <div class="v"><span class="unit">R$</span><input id="cost-packaging" class="num" type="number" min="0" step="0.01" value="5" /></div>
+            </div>
+            <div id="extra-costs"></div>
+            <div class="kv" style="margin-top:12px">
+              <div class="k">⚡ Variáveis <small>desperdício, gás, luz, água</small></div>
+              <div class="v"><input id="cost-variable" class="num" type="number" min="0" max="100" step="1" value="15" /><span class="unit">%</span></div>
+            </div>
+            <div class="calc"><span>Calculado sobre os ingredientes</span><b class="num" id="t-variable">R$ 0,00</b></div>
+            <div class="total-line"><span class="label">FIXOS</span><span class="value num" id="t-fixed">R$ 0,00</span></div>
+          </div>
+          <div class="card blue">
+            <div class="card-head"><h3><span class="step-n">3</span> Seu trabalho</h3></div>
+            <div class="kv">
+              <div class="k">Valor da sua hora</div>
+              <div class="v"><span class="unit">R$</span><input id="labor-rate" class="num" type="number" min="0" step="0.5" value="7.5" /></div>
+              <div class="k">Horas trabalhadas <small>puxado do tempo de preparo</small></div>
+              <div class="v"><input id="labor-hours" class="num" type="number" min="0" step="0.25" value="1" /><span class="unit">h</span></div>
+            </div>
+            <div class="total-line"><span class="label">MÃO DE OBRA</span><span class="value num" id="t-labor">R$ 0,00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="stats">
+          <div class="card pink stat">
+            <svg class="bg" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="#FEF1CF" stroke-width="6"/><rect x="30" y="34" width="10" height="14" fill="#FEF1CF"/><rect x="60" y="34" width="10" height="14" fill="#FEF1CF"/><path d="M28 62c6 10 38 10 44 0" stroke="#FEF1CF" stroke-width="6" fill="none"/></svg>
+            <span class="lbl">Custo total</span>
+            <div><div class="big num" id="s-cost">R$ 0,00</div><div class="sub"><span class="num" id="s-cost-unit">R$ 0,00</span> por unidade</div></div>
+          </div>
+          <div class="card blue stat margin">
+            <span class="lbl">Seu lucro</span>
+            <div>
+              <div class="big"><input id="margin" type="number" min="0" max="500" step="5" value="100" /><span class="pct">%</span></div>
+              <input id="margin-range" type="range" min="0" max="300" step="5" value="100" aria-label="Margem de lucro" />
+              <div class="sub">margem sobre o custo</div>
+            </div>
+          </div>
+          <div class="card stat price">
+            <svg class="bg" viewBox="0 0 60 60" aria-hidden="true"><path d="M30 2c2 18 10 26 28 28-18 2-26 10-28 28-2-18-10-26-28-28 18-2 26-10 28-28Z" fill="#FC3B7F"/></svg>
+            <span class="lbl">Cobre</span>
+            <div><div class="big num" id="s-price-unit">R$ 0,00</div><div class="sub">por unidade · lote <span class="num" id="s-price-total">R$ 0,00</span></div></div>
+          </div>
+        </div>
+        <div class="results">
+          <div class="result"><span class="k">Faturamento do lote</span><span class="v num" id="r-revenue">R$ 0,00<small id="r-revenue-sub"></small></span></div>
+          <div class="result good"><span class="k">Sobra pra você</span><span class="v num" id="r-profit">R$ 0,00<small id="r-profit-sub"></small></span></div>
+          <div class="result"><span class="k">Markup</span><span class="v num" id="r-markup">×1,00</span></div>
+        </div>
+
+        <div class="gap">
+          <div>
+            <span class="eyebrow">teste rápido</span>
+            <h3>Por quanto você vende hoje?</h3>
+            <p>Digite o preço que você cobra por unidade e veja o que está deixando na mesa a cada lote.</p>
+            <div class="in"><span class="unit">R$</span><input id="sell-today" class="num" type="number" min="0" step="0.5" placeholder="2,00" /><span class="unit">por unidade</span></div>
+          </div>
+          <div class="out">
+            <div class="k" id="gap-k">Resultado com o seu preço</div>
+            <div class="v num" id="gap-v">—</div>
+            <div class="s" id="gap-s">Preencha o preço ao lado.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost" onclick="clearRecipe()">↺ Nova receita</button>
+          <div class="right">
+            <button class="btn" onclick="exportPdf()">⤓ Baixar em PDF</button>
+            <button class="btn pink" onclick="saveFavorite()">★ Salvar receita</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-library" role="tabpanel" hidden>
+      <div class="card">
+        <div class="card-head">
+          <h3>Sua despensa</h3>
+          <button class="btn sm" onclick="addIngredient()">+ Ingrediente</button>
+          <p>Cadastre com o valor da embalagem inteira. O custo por grama, mililitro ou unidade é calculado na hora e vale pra todas as receitas.</p>
+        </div>
+        <div class="lib-scroll">
+          <table class="lib-table">
+            <thead><tr><th style="min-width:180px">Ingrediente</th><th style="width:110px">Unidade</th><th style="width:120px">Qtd. emb.</th><th style="width:140px">Valor pago</th><th class="r">Custo unit.</th><th style="width:44px"></th></tr></thead>
+            <tbody id="lib-rows"></tbody>
+          </table>
+        </div>
+        <div class="total-line"><span class="label">INGREDIENTES CADASTRADOS</span><span class="value num" id="lib-count">0</span></div>
+      </div>
+      <div class="card tips">
+        <div class="card-head"><h3>💡 Dicas de quem já precifica</h3></div>
+        <ul>
+          <li>Cadastre o ingrediente com o <b>valor da embalagem completa</b> (ex.: leite condensado 395 g por R$ 6,90).</li>
+          <li>Use a mesma unidade da receita: <b>g</b> para sólidos, <b>ml</b> para líquidos e <b>unid.</b> para ovos e afins.</li>
+          <li>Subiu no mercado? Atualize aqui e todas as receitas recalculam sozinhas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-favorites" role="tabpanel" hidden>
+      <div class="card-head" style="margin-bottom:20px">
+        <h3 style="font-size:22px">★ Minhas receitas</h3>
+        <p>Cada receita guarda custo, preço e margem do momento em que foi salva. Clique em “Usar receita” pra carregar de novo.</p>
+      </div>
+      <div class="fav-grid" id="fav-grid"></div>
+    </div>
+  </div>
+</section>
+
+<section class="bento-sec">
+  <div class="wrap">
+    <span class="eyebrow">o que muda</span>
+    <h2 class="title reveal">Feita pra cozinha de verdade, <em>não</em> pra contador.</h2>
+    <div class="bento">
+      <div class="card pink b-1 reveal"><div class="big-n">R$/unid.</div><h3>Preço por unidade, não por lote</h3><p>Você vende brigadeiro por brigadeiro. A conta tem que terminar no mesmo lugar.</p></div>
+      <div class="card b-2 reveal"><svg class="deco" viewBox="0 0 60 60" aria-hidden="true"><path d="M30 2c2 18 10 26 28 28-18 2-26 10-28 28-2-18-10-26-28-28 18-2 26-10 28-28Z" fill="#FC3B7F" stroke="#0032A8" stroke-width="3"/></svg><h3>Seu tempo vira dinheiro</h3><p>Defina quanto vale a sua hora. Ela entra no custo, não no “lucro” que some.</p></div>
+      <div class="card blue b-3 reveal"><h3>Despensa que aprende</h3><p>Cadastrou uma vez, usou em todas as receitas. Mudou o preço, mudou em tudo.</p></div>
+      <div class="card b-4 reveal"><h3>Receitas salvas</h3><p>Cada doce com seu preço certo, pronto pra próxima encomenda.</p></div>
+      <div class="card b-5 reveal"><svg class="deco" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 4l30 20-13 3 8 14-6 3-8-14-11 9z" fill="#FEF1CF" stroke="#0032A8" stroke-width="3" stroke-linejoin="round"/></svg><h3>PDF pra mandar pro cliente</h3><p>Orçamento bonito em um clique, sem planilha feia no print.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="duvidas">
+  <div class="wrap">
+    <div><span class="eyebrow">dúvidas</span><h2 class="title reveal">O que todo mundo pergunta antes de cobrar <em>certo.</em></h2></div>
+    <div>
+      <details open><summary>Serve pra bolo, salgado, cookie?</summary><p>Serve pra qualquer coisa que você produz e vende por unidade ou porção. A lógica é a mesma: ingredientes, custos fixos, seu tempo e margem.</p></details>
+      <details><summary>Preciso saber de matemática ou de planilha?</summary><p>Não. Você preenche o que já sabe: quanto pagou, quanto usou, quanto tempo levou. A conta é toda automática.</p></details>
+      <details><summary>Que margem eu devo usar?</summary><p>Entre 80% e 150% sobre o custo é comum em confeitaria artesanal. Comece em 100%, teste o preço no cliente e ajuste pelo slider.</p></details>
+      <details><summary>Minhas receitas ficam guardadas?</summary><p>Sim. Elas ficam no seu aparelho, só você vê. Nenhum dado seu sai daqui.</p></details>
+      <details><summary>E se o preço ficar “caro demais”?</summary><p>Então ele ficou certo. Quem cobra o custo real escolhe cliente, entrega melhor e não trabalha de graça.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <svg class="ring2" viewBox="0 0 400 220" fill="none" aria-hidden="true"><ellipse cx="200" cy="110" rx="190" ry="70" stroke="#FEF1CF" stroke-width="5" transform="rotate(-14 200 110)"/></svg>
+  <div class="wrap">
+    <span class="eyebrow">última fornada do dia</span>
+    <h2 class="reveal">Sua próxima encomenda já pode sair com o preço certo.</h2>
+    <p class="lead reveal">Dois minutos. Sem cadastro. O preço de cada doce que você faz.</p>
+    <a class="btn blue xl" href="#planilha">Calcular meu preço agora <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 11h14l-1.4 8.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 11Z" fill="#FEF1CF" stroke="#0032A8" stroke-width="1.8"/><path d="M6 11c-1.5-3.5.5-6 3-6 1-2.5 5-2.5 6 0 2.5 0 4.5 2.5 3 6" fill="#FEF1CF" stroke="#0032A8" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="4" r="1.6" fill="#0032A8"/></svg></span><span class="name">Doce Conta</span></a>
+    <div class="links"><a href="#dor">Por quê</a><a href="#como">Como funciona</a><a href="#planilha">A planilha</a><a href="#duvidas">Dúvidas</a></div>
+    <span class="tagline">feito pra quem vive de fazer doce</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="print-sheet" aria-hidden="true"></div>
+
+<script>
+const KEY = 'doce-conta:v1';
+const uid = () => Math.random().toString(36).slice(2, 9);
+const seedIngredients = [
+  { id: uid(), name: 'Leite condensado', unit: 'g', pack: 395, price: 6.90 },
+  { id: uid(), name: 'Chocolate ao leite', unit: 'g', pack: 1000, price: 73.80 },
+  { id: uid(), name: 'Ovomaltine', unit: 'g', pack: 300, price: 12.90 },
+  { id: uid(), name: 'Manteiga sem sal', unit: 'g', pack: 200, price: 13.90 },
+  { id: uid(), name: 'Cacau em pó', unit: 'g', pack: 200, price: 23.90 },
+  { id: uid(), name: 'Açúcar', unit: 'g', pack: 1000, price: 4.99 },
+  { id: uid(), name: 'Ovos', unit: 'unid', pack: 30, price: 23.90 },
+  { id: uid(), name: 'Leite integral', unit: 'ml', pack: 1000, price: 5.49 },
+  { id: uid(), name: 'Creme de leite', unit: 'g', pack: 200, price: 3.69 },
+];
+const blankRecipe = () => ({ name: '', yield: 20, time: 1, rows: [], packaging: 5, extras: [], variableRate: 15, laborRate: 7.5, laborHours: 1, margin: 100, sellToday: null });
+let state = load();
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.ingredients) return s; } catch (e) {}
+  const ing = seedIngredients; const r = blankRecipe(); r.name = 'Brigadeiro de Ovomaltine'; r.sellToday = 2;
+  r.rows = [ { id: uid(), ingredientId: ing[0].id, qty: 395 }, { id: uid(), ingredientId: ing[1].id, qty: 50 }, { id: uid(), ingredientId: ing[2].id, qty: 80 }, { id: uid(), ingredientId: ing[3].id, qty: 20 } ];
+  return { ingredients: ing, recipe: r, favorites: [] };
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const money = v => fmt.format(isFinite(v) ? v : 0);
+const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : 0; };
+const UNITS = [ { value: 'g', label: 'gramas', short: 'g' }, { value: 'ml', label: 'mililitros', short: 'ml' }, { value: 'unid', label: 'unidades', short: 'unid.' } ];
+const unitLabel = u => (UNITS.find(x => x.value === u) || { short: u }).short;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = id => document.getElementById(id);
+const unitCost = ing => (ing && ing.pack > 0) ? ing.price / ing.pack : 0;
+const ingById = id => state.ingredients.find(i => i.id === id);
+let toastTimer;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+
+/* ---- custom dropdown ---- */
+function dropdown({ kind, id, value, options, placeholder, head }) {
+  const sel = options.find(o => o.value === value);
+  return `<div class="dd" data-dd="${kind}" data-id="${id}">
+    <button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"><span class="lbl ${sel ? '' : 'ph'}">${esc(sel ? sel.label : placeholder)}</span><span class="chev"></span></button>
+    <div class="dd-menu" role="listbox">${head ? `<div class="dd-head">${esc(head)}</div>` : ''}${options.length ? options.map(o => `<button type="button" role="option" class="dd-opt ${o.value === value ? 'sel' : ''}" data-value="${esc(o.value)}"><span>${esc(o.label)}</span>${o.meta ? `<small>${esc(o.meta)}</small>` : ''}</button>`).join('') : '<div class="dd-opt empty">Cadastre ingredientes na despensa</div>'}</div>
+  </div>`;
+}
+function closeDropdowns(except) { document.querySelectorAll('.dd.open').forEach(d => { if (d !== except) { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded', 'false'); } }); }
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.dd-btn');
+  if (btn) {
+    const dd = btn.parentElement; const open = !dd.classList.contains('open'); closeDropdowns(dd);
+    dd.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open));
+    if (open) { const r = dd.getBoundingClientRect(); dd.classList.toggle('up', window.innerHeight - r.bottom < 300 && r.top > 300); (dd.querySelector('.dd-opt.sel') || dd.querySelector('.dd-opt'))?.focus(); }
+    return;
+  }
+  const opt = e.target.closest('.dd-opt[data-value]');
+  if (opt) { const dd = opt.closest('.dd'); onDropdownChange(dd.dataset.dd, dd.dataset.id, opt.dataset.value); closeDropdowns(); return; }
+  if (!e.target.closest('.dd')) closeDropdowns();
+});
+document.addEventListener('keydown', e => {
+  const dd = e.target.closest('.dd'); if (!dd) return;
+  const opts = [...dd.querySelectorAll('.dd-opt[data-value]')]; const i = opts.indexOf(document.activeElement);
+  if (e.key === 'Escape') { closeDropdowns(); dd.querySelector('.dd-btn').focus(); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); if (!dd.classList.contains('open')) dd.querySelector('.dd-btn').click(); else opts[Math.min(opts.length - 1, i + 1)]?.focus(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); opts[Math.max(0, i - 1)]?.focus(); }
+});
+function onDropdownChange(kind, id, value) {
+  if (kind === 'row') { const row = state.recipe.rows.find(r => r.id === id); if (!row) return; row.ingredientId = value; save(); renderRecipeRows(); renderTotals(); }
+  if (kind === 'unit') { const ing = ingById(id); if (!ing) return; ing.unit = value; save(); renderLibrary(); renderRecipeRows(); renderTotals(); }
+}
+
+function selectTab(name) {
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+  document.querySelectorAll('.panel').forEach(p => p.hidden = p.id !== 'panel-' + name);
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+
+function compute() {
+  const r = state.recipe;
+  const ingredients = r.rows.reduce((s, row) => s + num(row.qty) * unitCost(ingById(row.ingredientId)), 0);
+  const variable = ingredients * num(r.variableRate) / 100;
+  const extras = r.extras.reduce((s, e) => s + num(e.value), 0);
+  const fixed = num(r.packaging) + extras + variable;
+  const labor = num(r.laborRate) * num(r.laborHours);
+  const cost = ingredients + fixed + labor;
+  const yieldN = Math.max(1, Math.round(num(r.yield)) || 1);
+  const priceUnit = Math.round((cost * (1 + num(r.margin) / 100) / yieldN) * 100) / 100;
+  const revenue = priceUnit * yieldN;
+  return { ingredients, variable, extras, fixed, labor, cost, yieldN, priceUnit, revenue, profit: revenue - cost, costUnit: cost / yieldN, markup: cost > 0 ? revenue / cost : 1 };
+}
+
+function renderRecipeHead() {
+  const r = state.recipe;
+  $('recipe-name').value = r.name; $('recipe-yield').value = r.yield; $('recipe-time').value = r.time;
+  $('cost-packaging').value = r.packaging; $('cost-variable').value = r.variableRate;
+  $('labor-rate').value = r.laborRate; $('labor-hours').value = r.laborHours;
+  $('margin').value = r.margin; $('margin-range').value = Math.min(300, r.margin);
+  $('sell-today').value = r.sellToday ?? '';
+}
+function renderRecipeRows() {
+  const box = $('recipe-rows'); const r = state.recipe;
+  if (!r.rows.length) { box.innerHTML = '<div class="empty">Nenhum ingrediente ainda. Clique em “+ Ingrediente”.</div>'; return; }
+  const opts = state.ingredients.filter(i => i.name.trim()).map(i => ({ value: i.id, label: i.name, meta: i.pack > 0 ? money(unitCost(i)) + '/' + unitLabel(i.unit) : '' }));
+  box.innerHTML = `<table><thead><tr><th>Ingrediente</th><th style="width:84px">Qtd</th><th class="r" style="width:86px">C. unit.</th><th class="r" style="width:84px">Total</th><th style="width:36px"></th></tr></thead><tbody>` +
+    r.rows.map(row => { const ing = ingById(row.ingredientId); const uc = unitCost(ing); return `<tr>
+        <td>${dropdown({ kind: 'row', id: row.id, value: row.ingredientId, options: opts, placeholder: 'Escolha um ingrediente', head: 'Sua despensa' })}</td>
+        <td><input class="num" type="number" min="0" step="any" value="${row.qty}" data-row="${row.id}" data-k="qty" placeholder="0" /></td>
+        <td class="r"><span class="num hint">${ing ? money(uc) + '/' + unitLabel(ing.unit) : '—'}</span></td>
+        <td class="r"><span class="num"><b>${money(num(row.qty) * uc)}</b></span></td>
+        <td class="r"><button class="btn icon ghost row-del" title="Remover" onclick="removeRecipeRow('${row.id}')">✕</button></td></tr>`; }).join('') + '</tbody></table>';
+}
+function renderExtras() {
+  $('extra-costs').innerHTML = state.recipe.extras.map(e => `
+    <div class="kv" style="margin-top:10px">
+      <div class="k"><input type="text" placeholder="Nome do custo (ex.: etiqueta)" value="${esc(e.name)}" data-extra="${e.id}" data-k="name" /></div>
+      <div class="v"><span class="unit">R$</span><input class="num" type="number" min="0" step="0.01" value="${e.value}" data-extra="${e.id}" data-k="value" /><button class="btn icon ghost row-del" title="Remover" onclick="removeExtraCost('${e.id}')">✕</button></div>
+    </div>`).join('');
+}
+function renderTotals() {
+  const c = compute();
+  $('t-ingredients').textContent = money(c.ingredients); $('t-variable').textContent = money(c.variable);
+  $('t-fixed').textContent = money(c.fixed); $('t-labor').textContent = money(c.labor);
+  $('s-cost').textContent = money(c.cost); $('s-cost-unit').textContent = money(c.costUnit);
+  $('s-price-unit').textContent = money(c.priceUnit); $('s-price-total').textContent = money(c.revenue);
+  $('r-revenue').firstChild.textContent = money(c.revenue); $('r-revenue-sub').textContent = `${c.yieldN} × ${money(c.priceUnit)}`;
+  $('r-profit').firstChild.textContent = money(c.profit); $('r-profit-sub').textContent = `${money(c.profit / c.yieldN)} por unidade`;
+  $('r-profit').parentElement.className = 'result ' + (c.profit >= 0 ? 'good' : 'bad');
+  $('r-markup').textContent = '×' + c.markup.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  renderGap(c);
+}
+function renderGap(c) {
+  const sell = state.recipe.sellToday; const k = $('gap-k'), v = $('gap-v'), s = $('gap-s');
+  if (sell === null || sell === '' || !isFinite(sell)) { k.textContent = 'Resultado com o seu preço'; v.textContent = '—'; v.className = 'v num'; s.textContent = 'Preencha o preço ao lado.'; return; }
+  const diff = (c.priceUnit - sell) * c.yieldN; const profitToday = sell * c.yieldN - c.cost;
+  if (diff > 0.005) { k.textContent = 'Você deixa na mesa, por lote'; v.textContent = money(diff); v.className = 'v num bad'; s.textContent = profitToday < 0 ? `Vendendo a ${money(sell)} você tem prejuízo de ${money(-profitToday)} por lote.` : `Com ${money(sell)} sobra só ${money(profitToday)} no lote, em vez de ${money(c.profit)}.`; }
+  else { k.textContent = 'Você já cobra acima do mínimo'; v.textContent = money(-diff); v.className = 'v num good'; s.textContent = `Seu preço rende ${money(profitToday)} por lote. Continua assim.`; }
+}
+function renderPricing() { renderRecipeRows(); renderExtras(); renderTotals(); }
+function renderPrint() {
+  const r = state.recipe, c = compute();
+  const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const mark = `<span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 11h14l-1.4 8.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 11Z" fill="#FEF1CF" stroke="#0032A8" stroke-width="1.8"/><path d="M6 11c-1.5-3.5.5-6 3-6 1-2.5 5-2.5 6 0 2.5 0 4.5 2.5 3 6" fill="#FEF1CF" stroke="#0032A8" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="4" r="1.6" fill="#0032A8"/></svg></span>`;
+  const rows = r.rows.filter(row => ingById(row.ingredientId)).map(row => { const ing = ingById(row.ingredientId), uc = unitCost(ing); return `<tr><td>${esc(ing.name)}</td><td class="r num">${num(row.qty).toLocaleString('pt-BR')} ${unitLabel(ing.unit)}</td><td class="r num muted">${money(uc)}/${unitLabel(ing.unit)}</td><td class="r num"><b>${money(num(row.qty) * uc)}</b></td></tr>`; }).join('');
+  const extras = r.extras.filter(e => num(e.value) > 0).map(e => `<tr><td>${esc(e.name || 'Outro custo')}</td><td class="r num">${money(num(e.value))}</td></tr>`).join('');
+  $('print-sheet').innerHTML = `
+    <div class="ps-head"><span class="brand">${mark}<span class="name">Doce Conta</span></span><div class="doc"><b>Ficha de precificação</b>${today}</div></div>
+    <div class="ps-title"><h1>${esc(r.name || 'Receita sem nome')}</h1><div class="meta"><span>Rendimento: ${c.yieldN} unid.</span><span>Preparo: ${num(r.time).toLocaleString('pt-BR')} h</span><span>${r.rows.length} ingredientes</span></div></div>
+    <div class="ps-band">
+      <div class="main"><div class="k">Preço de venda por unidade</div><div class="v num">${money(c.priceUnit)}</div><div class="s">lote de ${c.yieldN} unidades: ${money(c.revenue)}</div></div>
+      <div class="alt"><div class="k">Custo por unidade</div><div class="v num">${money(c.costUnit)}</div><div class="s">custo total ${money(c.cost)}</div></div>
+      <div class="alt"><div class="k">Margem de lucro</div><div class="v num">${num(r.margin).toLocaleString('pt-BR')}%</div><div class="s">markup ×${c.markup.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div></div>
+    </div>
+    <div class="ps-sec"><h2><span class="n">1</span> Ingredientes</h2>
+      <table><thead><tr><th>Ingrediente</th><th class="r">Quantidade</th><th class="r">Custo unit.</th><th class="r">Total</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="muted">Nenhum ingrediente informado.</td></tr>'}</tbody></table>
+      <div class="sub"><span>SUBTOTAL INGREDIENTES</span><b class="num">${money(c.ingredients)}</b></div></div>
+    <div class="ps-cols">
+      <div class="ps-sec"><h2><span class="n">2</span> Custos fixos</h2>
+        <table><tbody><tr><td>Embalagens</td><td class="r num">${money(num(r.packaging))}</td></tr>${extras}<tr><td>Variáveis (${num(r.variableRate).toLocaleString('pt-BR')}% sobre ingredientes)<div class="muted">desperdício, gás, luz, água</div></td><td class="r num">${money(c.variable)}</td></tr></tbody></table>
+        <div class="sub"><span>SUBTOTAL FIXOS</span><b class="num">${money(c.fixed)}</b></div></div>
+      <div class="ps-sec"><h2><span class="n">3</span> Mão de obra</h2>
+        <table><tbody><tr><td>Valor da hora</td><td class="r num">${money(num(r.laborRate))}</td></tr><tr><td>Horas trabalhadas</td><td class="r num">${num(r.laborHours).toLocaleString('pt-BR')} h</td></tr></tbody></table>
+        <div class="sub"><span>SUBTOTAL MÃO DE OBRA</span><b class="num">${money(c.labor)}</b></div></div>
+    </div>
+    <div class="ps-total">
+      <div><div class="k">Custo total</div><div class="v num">${money(c.cost)}</div></div>
+      <div><div class="k">Faturamento do lote</div><div class="v num">${money(c.revenue)}</div></div>
+      <div><div class="k">Lucro do lote</div><div class="v num good">${money(c.profit)}</div></div>
+      <div><div class="k">Lucro por unidade</div><div class="v num good">${money(c.profit / c.yieldN)}</div></div>
+    </div>
+    <div class="ps-foot"><span><b>Doce Conta</b> · feito pra quem vive de fazer doce</span><span>Preços dos ingredientes informados em ${new Date().toLocaleDateString('pt-BR')}. Recalcule quando o mercado mudar.</span></div>`;
+}
+function exportPdf() { renderPrint(); const t = document.title; document.title = `Precificação - ${state.recipe.name || 'receita'}`; window.print(); document.title = t; }
+window.addEventListener('beforeprint', renderPrint);
+
+const unitCostText = i => i.pack > 0 ? unitCost(i).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 4 }) + '/' + unitLabel(i.unit) : '—';
+function renderLibrary() {
+  $('lib-rows').innerHTML = state.ingredients.map(i => `
+    <tr>
+      <td><input type="text" value="${esc(i.name)}" placeholder="Nome do ingrediente" data-ing="${i.id}" data-k="name" /></td>
+      <td>${dropdown({ kind: 'unit', id: i.id, value: i.unit, options: UNITS.map(u => ({ value: u.value, label: u.short, meta: u.label })), placeholder: 'un.' })}</td>
+      <td><input class="num" type="number" min="0" step="any" value="${i.pack}" placeholder="Ex.: 395" data-ing="${i.id}" data-k="pack" /></td>
+      <td><div style="display:flex;align-items:center;gap:6px"><span class="hint">R$</span><input class="num" type="number" min="0" step="0.01" value="${i.price}" placeholder="0,00" data-ing="${i.id}" data-k="price" /></div></td>
+      <td class="r"><span class="unitcost">${unitCostText(i)}</span></td>
+      <td class="r"><button class="btn icon ghost row-del" title="Remover" onclick="removeIngredient('${i.id}')">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="6"><div class="empty">Sua despensa está vazia. Adicione o primeiro ingrediente.</div></td></tr>';
+  $('lib-count').textContent = state.ingredients.length; $('count-ingredients').textContent = state.ingredients.length;
+}
+
+function renderFavorites() {
+  const g = $('fav-grid'); $('count-favorites').textContent = state.favorites.length;
+  if (!state.favorites.length) { g.innerHTML = '<div class="empty" style="grid-column:1/-1">Nenhuma receita salva ainda. Precifique uma e clique em “★ Salvar receita”.</div>'; return; }
+  g.innerHTML = state.favorites.map((f, idx) => `
+    <article class="card fav">
+      <span class="tag pink ribbon">RECEITA ${String(idx + 1).padStart(2, '0')}</span>
+      <button class="btn icon ghost del" title="Excluir" onclick="removeFavorite('${f.id}')">✕</button>
+      <h4>★ ${esc(f.recipe.name || 'Sem nome')}</h4>
+      <div class="meta"><span>⏱ ${f.recipe.time}h · ${f.snapshot.yieldN} unid.</span><span>▤ ${f.recipe.rows.length} ingredientes</span></div>
+      <div class="nums">
+        <div><div class="k">Custo</div><div class="v num">${money(f.snapshot.cost)}</div></div>
+        <div><div class="k">Cobre</div><div class="v num pink">${money(f.snapshot.priceUnit)}<span class="hint">/unid.</span></div></div>
+        <div><div class="k">Sobra</div><div class="v num">${money(f.snapshot.profit)}</div></div>
+        <div><div class="k">Margem</div><div class="v num">${f.recipe.margin}%</div></div>
+      </div>
+      <button class="btn blue" onclick="useFavorite('${f.id}')">▶ Usar receita</button>
+    </article>`).join('');
+}
+
+function addRecipeRow() { state.recipe.rows.push({ id: uid(), ingredientId: '', qty: 0 }); save(); renderPricing(); }
+function removeRecipeRow(id) { state.recipe.rows = state.recipe.rows.filter(r => r.id !== id); save(); renderPricing(); }
+function addExtraCost() { state.recipe.extras.push({ id: uid(), name: '', value: 0 }); save(); renderExtras(); renderTotals(); const inputs = $('extra-costs').querySelectorAll('input[type=text]'); inputs[inputs.length - 1]?.focus(); }
+function removeExtraCost(id) { state.recipe.extras = state.recipe.extras.filter(e => e.id !== id); save(); renderExtras(); renderTotals(); }
+function addIngredient() { state.ingredients.push({ id: uid(), name: '', unit: 'g', pack: 0, price: 0 }); save(); renderLibrary(); renderRecipeRows(); $('lib-rows').querySelector('tr:last-child input')?.focus(); }
+function removeIngredient(id) {
+  const ing = ingById(id); if (ing && ing.name && !confirm(`Remover “${ing.name}” da despensa?`)) return;
+  state.ingredients = state.ingredients.filter(i => i.id !== id);
+  state.recipe.rows.forEach(r => { if (r.ingredientId === id) r.ingredientId = ''; });
+  save(); renderLibrary(); renderPricing();
+}
+function clearRecipe() { if (!confirm('Começar uma nova receita em branco?')) return; state.recipe = blankRecipe(); save(); renderRecipeHead(); renderPricing(); toast('Nova receita'); $('recipe-name').focus(); }
+function saveFavorite() {
+  const r = state.recipe; if (!r.name.trim()) { $('recipe-name').focus(); toast('Dê um nome à receita antes de salvar'); return; }
+  state.favorites.unshift({ id: uid(), recipe: JSON.parse(JSON.stringify(r)), snapshot: compute() });
+  save(); renderFavorites(); toast('★ Receita salva');
+}
+function removeFavorite(id) { state.favorites = state.favorites.filter(f => f.id !== id); save(); renderFavorites(); }
+function useFavorite(id) {
+  const f = state.favorites.find(x => x.id === id); if (!f) return;
+  const rec = JSON.parse(JSON.stringify(f.recipe)); rec.rows.forEach(row => { if (!ingById(row.ingredientId)) row.ingredientId = ''; });
+  state.recipe = rec; save(); renderRecipeHead(); renderPricing(); selectTab('pricing'); $('planilha').scrollIntoView({ behavior: 'smooth' }); toast('Receita carregada');
+}
+
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.row) { const row = state.recipe.rows.find(r => r.id === el.dataset.row); if (!row) return; row.qty = num(el.value); save(); refreshRowTotals(); renderTotals(); return; }
+  if (el.dataset.extra) { const ex = state.recipe.extras.find(x => x.id === el.dataset.extra); if (!ex) return; ex[el.dataset.k] = el.dataset.k === 'value' ? num(el.value) : el.value; save(); renderTotals(); return; }
+  if (el.dataset.ing) { const ing = ingById(el.dataset.ing); if (!ing) return; ing[el.dataset.k] = (el.dataset.k === 'pack' || el.dataset.k === 'price') ? num(el.value) : el.value; save(); const tr = el.closest('tr'); if (tr) tr.querySelector('.unitcost').textContent = unitCostText(ing); renderRecipeRows(); renderTotals(); return; }
+  const r = state.recipe;
+  const map = { 'recipe-name': ['name', v => v], 'recipe-yield': ['yield', num], 'recipe-time': ['time', num], 'cost-packaging': ['packaging', num], 'cost-variable': ['variableRate', num], 'labor-rate': ['laborRate', num], 'labor-hours': ['laborHours', num], 'margin': ['margin', num], 'margin-range': ['margin', num], 'sell-today': ['sellToday', v => v === '' ? null : num(v)] };
+  if (map[el.id]) {
+    const [k, f] = map[el.id]; r[k] = f(el.value);
+    if (el.id === 'recipe-time') { r.laborHours = r.time; $('labor-hours').value = r.time; }
+    if (el.id === 'margin') $('margin-range').value = Math.min(300, r.margin);
+    if (el.id === 'margin-range') $('margin').value = r.margin;
+    save(); renderTotals();
+  }
+});
+function refreshRowTotals() {
+  document.querySelectorAll('#recipe-rows tbody tr').forEach(tr => {
+    const dd = tr.querySelector('.dd'); const row = state.recipe.rows.find(r => r.id === dd.dataset.id); if (!row) return;
+    const ing = ingById(row.ingredientId); const uc = unitCost(ing);
+    tr.children[2].firstElementChild.textContent = ing ? money(uc) + '/' + unitLabel(ing.unit) : '—';
+    tr.children[3].querySelector('b').textContent = money(num(row.qty) * uc);
+  });
+}
+
+$('marquee').innerHTML = Array(4).fill('<span>cobre o que vale</span><span>ingredientes</span><span>embalagem</span><span>seu tempo</span><span>margem</span><span>lucro de verdade</span>').join('');
+const revealEls = [...document.querySelectorAll('.reveal')];
+function reveal() { const h = window.innerHeight; revealEls.forEach(el => { if (el.classList.contains('in')) return; const r = el.getBoundingClientRect(); if (r.top < h * .92 && r.bottom > 0) el.classList.add('in'); }); }
+['scroll', 'resize', 'load'].forEach(ev => window.addEventListener(ev, reveal, { passive: true })); reveal(); setTimeout(reveal, 300);
+renderRecipeHead(); renderPricing(); renderLibrary(); renderFavorites();
+</script>
+</body>
+</html>
